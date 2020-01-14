@@ -49,6 +49,7 @@ func main() {
 	if (err != nil) {
 		panic(err)
 	}
+	ioutil.WriteFile(flag.Arg(0) + ".bak", data, 0644)
 
 	// read fresh game save data into buffer
 	ex, err := os.Executable()
@@ -117,5 +118,5 @@ func main() {
 	}
 
 	// write save data to file
-	err = ioutil.WriteFile(flag.Arg(0), fbytes, 0644)
+	ioutil.WriteFile(flag.Arg(0), fbytes, 0644)
 }
