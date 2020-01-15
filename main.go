@@ -22,6 +22,7 @@ var merc_start_regexp = regexp.MustCompile(`\x00MercCompanyModel\x00`)
 var merc_end_regexp = regexp.MustCompile(`\x00FinanceModel\x00`)
 var reputation_regexp = regexp.MustCompile(`x00Reputation\x00.{33}`)
 var cid_regexp = regexp.MustCompile(`CampaignIdentifier.{62}`)
+var company_regexp = regexp.MustCompile(`(?s)CompanyName.{40}[^\x00]*`)
 
 func usage() {
 	fmt.Fprintln(os.Stderr, "Mech Warrior 5 New Game Creator - Resets campaign progress for a mech warrior 5 mercenaries save file.")
@@ -72,6 +73,13 @@ func main() {
 	// copy cid
 	new_data = cid_regexp.ReplaceAllLiteral(new_data, cid_regexp.Find(data))
 
+	// copy company name
+	company_data := company_regexp.Find(data)
+	start := company_regexp.FindIndex(new_data)
+	for i := 51; i < len(company_data); i++ {
+		new_data[start[0] + i] = company_data[i]
+	}
+
 	// create new save buffer
 	var f bytes.Buffer
 
@@ -80,7 +88,7 @@ func main() {
 	f.Write(new_data[0:end[0]])
 
 	// copy inventory
-	start := inventory_start_regexp.FindIndex(data)
+	start = inventory_start_regexp.FindIndex(data)
 	end = inventory_end_regexp.FindIndex(data)
 	f.Write(data[start[0]:end[0]])
 
