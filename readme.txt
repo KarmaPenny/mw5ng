@@ -1,8 +1,17 @@
-1.) drag a save file onto mw5ng.exe
+# USAGE
+1.) Complete all work orders in game.
 
-2.) you will see a .bak file get created, this is the backup of your save. If something doesn't work you can rename this file to restore your data.
+2.) Save and exit.
 
-3.) start the game and load your file.
+3.) Drag and drop your save file onto mw5ng.exe
+		NOTE: Saves are located at %USER_PROFILE%/AppData/Local/MW5Mercs/Saved/SavedGames/
+		They have the ".sav" extension
 
-credit goes to the hypno toad
+4.) You will see a ".bak" file get created.
+		This is the backup of your save.
+		You can restore your save data by removing ".bak" from the file name.
+
+5.) Start the game and load your file.
+
+credit to the hypno toad
 ALL HAIL THE HYPNO TOAD!
