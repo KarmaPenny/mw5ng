@@ -20,7 +20,7 @@ var save_start_regexp = regexp.MustCompile(`\x00SaveStateModel\x00`)
 var save_end_regexp = regexp.MustCompile(`\x00DataCacheModel\x00`)
 var merc_start_regexp = regexp.MustCompile(`\x00MercCompanyModel\x00`)
 var merc_end_regexp = regexp.MustCompile(`\x00FinanceModel\x00`)
-var reputation_regexp = regexp.MustCompile(`x00Reputation\x00.{33}`)
+var reputation_regexp = regexp.MustCompile(`\x00Reputation\x00.{33}`)
 var cid_regexp = regexp.MustCompile(`CampaignIdentifier.{62}`)
 var company_regexp = regexp.MustCompile(`(?s)CompanyName.{40}[^\x00]*`)
 
