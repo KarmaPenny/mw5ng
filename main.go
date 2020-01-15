@@ -18,8 +18,11 @@ var roster_start_regexp = regexp.MustCompile(`\x00RosterModel\x00`)
 var roster_end_regexp = regexp.MustCompile(`\x00ToiModel\x00`)
 var save_start_regexp = regexp.MustCompile(`\x00SaveStateModel\x00`)
 var save_end_regexp = regexp.MustCompile(`\x00DataCacheModel\x00`)
+var merc_start_regexp = regexp.MustCompile(`\x00MercCompanyModel\x00`)
+var merc_end_regexp = regexp.MustCompile(`\x00FinanceModel\x00`)
 var reputation_regexp = regexp.MustCompile(`\x00Reputation\x00.{33}`)
 var cid_regexp = regexp.MustCompile(`CampaignIdentifier.{62}`)
+var name_regexp = regexp.MustCompile(`CompanyName.{40}[^\x00]*`)
 
 func usage() {
 	fmt.Fprintln(os.Stderr, "Mech Warrior 5 New Game Creator - Resets campaign progress for a mech warrior 5 mercenaries save file.")
@@ -64,11 +67,14 @@ func main() {
 		panic(err)
 	}
 
-	// copy xp data
+	// copy xp
 	new_data = reputation_regexp.ReplaceAllLiteral(new_data, reputation_regexp.Find(data))
 
-	// copy cid data
+	// copy cid
 	new_data = cid_regexp.ReplaceAllLiteral(new_data, cid_regexp.Find(data))
+
+	// copy company name
+	new_data = name_regexp.ReplaceAllLiteral(new_data, name_regexp.Find(data))
 
 	// create new save buffer
 	var f bytes.Buffer
@@ -119,6 +125,16 @@ func main() {
 	for i := 0; i < 4; i++ {
 		fbytes[i+148] = apb[i]
 		fbytes[i+174] = bpb[i]
+	}
+
+	// fix MercCompanyModel length
+	start = merc_start_regexp.FindIndex(fbytes)
+	end = merc_end_regexp.FindIndex(fbytes)
+	merc_length := end[0] - start[0] - 49
+	merc_length_b := make([]byte, 4)
+	binary.LittleEndian.PutUint32(merc_length_b, uint32(merc_length))
+	for i := 0; i < 4; i++ {
+		fbytes[i+start[0]+37] = merc_length_b[i]
 	}
 
 	// write save data to file
