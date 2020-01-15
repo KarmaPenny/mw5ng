@@ -3,5 +3,5 @@ Generates a new game plus save file for MechWarrior 5 Mercenaries.
 
 ## Usage
 ```bash
-mw5ng path_to_save_file.sav
+mw5ng.exe path_to_save_file.sav
 ```

@@ -19,6 +19,7 @@ var roster_end_regexp = regexp.MustCompile(`\x00ToiModel\x00`)
 var save_start_regexp = regexp.MustCompile(`\x00SaveStateModel\x00`)
 var save_end_regexp = regexp.MustCompile(`\x00DataCacheModel\x00`)
 var reputation_regexp = regexp.MustCompile(`\x00Reputation\x00.{33}`)
+var cid_regexp = regexp.MustCompile(`CampaignIdentifier.{62}`)
 
 func usage() {
 	fmt.Fprintln(os.Stderr, "Mech Warrior 5 New Game Creator - Resets campaign progress for a mech warrior 5 mercenaries save file.")
@@ -65,6 +66,9 @@ func main() {
 
 	// copy xp data
 	new_data = reputation_regexp.ReplaceAllLiteral(new_data, reputation_regexp.Find(data))
+
+	// copy cid data
+	new_data = cid_regexp.ReplaceAllLiteral(new_data, cid_regexp.Find(data))
 
 	// create new save buffer
 	var f bytes.Buffer
