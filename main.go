@@ -14,6 +14,8 @@ import (
 
 var inventory_start_regexp = regexp.MustCompile(`\x00InventoryModel\x00`)
 var inventory_end_regexp = regexp.MustCompile(`\x00MarketModel\x00`)
+var faction_start_regexp = regexp.MustCompile(`\x00FactionStandingList\x00`)
+var faction_end_regexp = regexp.MustCompile(`\x00CampaignIdentifier\x00`)
 var roster_start_regexp = regexp.MustCompile(`\x00RosterModel\x00`)
 var roster_end_regexp = regexp.MustCompile(`\x00ToiModel\x00`)
 var save_start_regexp = regexp.MustCompile(`\x00SaveStateModel\x00`)
@@ -94,6 +96,16 @@ func main() {
 
 	// copy filler from new data
 	start = inventory_end_regexp.FindIndex(new_data)
+	end = faction_start_regexp.FindIndex(new_data)
+	f.Write(new_data[start[0]:end[0]])
+
+	// copy faction standing list
+	start = faction_start_regexp.FindIndex(data)
+	end = faction_end_regexp.FindIndex(data)
+	f.Write(data[start[0]:end[0]])
+
+	// copy filler from new data
+	start = faction_end_regexp.FindIndex(new_data)
 	end = roster_start_regexp.FindIndex(new_data)
 	f.Write(new_data[start[0]:end[0]])
 
