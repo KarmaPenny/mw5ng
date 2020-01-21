@@ -55,7 +55,11 @@ func main() {
 	if (err != nil) {
 		panic(err)
 	}
-	ioutil.WriteFile(flag.Arg(0) + ".bak", data, 0644)
+
+	// create backup file if one doesn't already exist
+	if _, err = os.Stat(flag.Arg(0) + ".bak"); os.IsNotExist(err) {
+		ioutil.WriteFile(flag.Arg(0) + ".bak", data, 0644)
+	}
 
 	// read fresh game save data into buffer
 	ex, err := os.Executable()
