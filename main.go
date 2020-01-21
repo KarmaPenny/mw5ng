@@ -12,6 +12,9 @@ import (
 	"regexp"
 )
 
+var reset_faction_standings *bool
+var reset_reputation *bool
+
 var inventory_start_regexp = regexp.MustCompile(`\x00InventoryModel\x00`)
 var inventory_end_regexp = regexp.MustCompile(`\x00MarketModel\x00`)
 var faction_start_regexp = regexp.MustCompile(`\x00FactionStandingList\x00`)
@@ -33,6 +36,10 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "Usage: mw5ng [FILE]")
 	fmt.Fprintln(os.Stderr, "Example: mw5ng file.sav")
 	fmt.Fprintln(os.Stderr, "")
+	fmt.Fprintln(os.Stderr, "Options:")
+	fmt.Fprintln(os.Stderr, "  -f        reset faction standings")
+	fmt.Fprintln(os.Stderr, "  -r        reset reputation")
+	fmt.Fprintln(os.Stderr, "")
 	fmt.Fprintln(os.Stderr, "Copyright (C) 2019 Cole Robinette")
 	fmt.Fprintln(os.Stderr, "This program is free to use, redistribute, and modify under")
 	fmt.Fprintln(os.Stderr, "the terms of the GNU General Public License version 3. This")
@@ -41,6 +48,8 @@ func usage() {
 }
 
 func init() {
+	reset_faction_standings = flag.Bool("f", false, "reset faction standings")
+	reset_reputation = flag.Bool("r", false, "reset reputation")
 	flag.Usage = usage
 	flag.Parse()
 	if flag.NArg() != 1 {
@@ -73,21 +82,23 @@ func main() {
 		panic(err)
 	}
 
-	// copy xp
-	reputation_index := reputation_regexp.FindIndex(data)
-	start := reputation_regexp.FindIndex(new_data)
-	for i := 0; i < 4; i++ {
-		new_data[start[0] + 37 + i] = data[reputation_index[0] + 37 + i]
-	}
-
 	// copy cid
 	new_data = cid_regexp.ReplaceAllLiteral(new_data, cid_regexp.Find(data))
 
 	// copy company name
 	company_data := company_regexp.Find(data)
-	start = company_regexp.FindIndex(new_data)
+	start := company_regexp.FindIndex(new_data)
 	for i := 51; i < len(company_data); i++ {
 		new_data[start[0] + i] = company_data[i]
+	}
+
+	// copy xp
+	if !*reset_reputation {
+		reputation_index := reputation_regexp.FindIndex(data)
+		start = reputation_regexp.FindIndex(new_data)
+		for i := 0; i < 4; i++ {
+			new_data[start[0] + 37 + i] = data[reputation_index[0] + 37 + i]
+		}
 	}
 
 	// create new save buffer
@@ -102,20 +113,27 @@ func main() {
 	end = inventory_end_regexp.FindIndex(data)
 	f.Write(data[start[0]:end[0]])
 
-	// copy filler from new data
-	start = inventory_end_regexp.FindIndex(new_data)
-	end = faction_start_regexp.FindIndex(new_data)
-	f.Write(new_data[start[0]:end[0]])
+	if !*reset_faction_standings {
+		// copy filler from new data
+		start = inventory_end_regexp.FindIndex(new_data)
+		end = faction_start_regexp.FindIndex(new_data)
+		f.Write(new_data[start[0]:end[0]])
 
-	// copy faction standing list
-	start = faction_start_regexp.FindIndex(data)
-	end = faction_end_regexp.FindIndex(data)
-	f.Write(data[start[0]:end[0]])
+		// copy faction standing list
+		start = faction_start_regexp.FindIndex(data)
+		end = faction_end_regexp.FindIndex(data)
+		f.Write(data[start[0]:end[0]])
 
-	// copy filler from new data
-	start = faction_end_regexp.FindIndex(new_data)
-	end = roster_start_regexp.FindIndex(new_data)
-	f.Write(new_data[start[0]:end[0]])
+		// copy filler from new data
+		start = faction_end_regexp.FindIndex(new_data)
+		end = roster_start_regexp.FindIndex(new_data)
+		f.Write(new_data[start[0]:end[0]])
+	} else {
+		// copy filler from new data
+		start = inventory_end_regexp.FindIndex(new_data)
+		end = roster_start_regexp.FindIndex(new_data)
+		f.Write(new_data[start[0]:end[0]])
+	}
 
 	// copy roster
 	start = roster_start_regexp.FindIndex(data)
