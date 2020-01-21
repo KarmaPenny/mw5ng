@@ -74,14 +74,18 @@ func main() {
 	}
 
 	// copy xp
-	new_data = reputation_regexp.ReplaceAllLiteral(new_data, reputation_regexp.Find(data))
+	reputation_index := reputation_regexp.FindIndex(data)
+	start := reputation_regexp.FindIndex(new_data)
+	for i := 0; i < 4; i++ {
+		new_data[start[0] + 37 + i] = data[reputation_index[0] + 37 + i]
+	}
 
 	// copy cid
 	new_data = cid_regexp.ReplaceAllLiteral(new_data, cid_regexp.Find(data))
 
 	// copy company name
 	company_data := company_regexp.Find(data)
-	start := company_regexp.FindIndex(new_data)
+	start = company_regexp.FindIndex(new_data)
 	for i := 51; i < len(company_data); i++ {
 		new_data[start[0] + i] = company_data[i]
 	}
