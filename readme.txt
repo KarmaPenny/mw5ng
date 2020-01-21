@@ -13,5 +13,14 @@
 
 5.) Start the game and load your file.
 
+# COMMAND USAGE
+
+Usage: mw5ng.exe [FILE]
+Example: mw5ng.exe -f -r c:\path\to\save\file.sav
+
+Options:
+  -f        reset faction standings
+  -r        reset reputation
+
 credit to the hypno toad
 ALL HAIL THE HYPNO TOAD!
